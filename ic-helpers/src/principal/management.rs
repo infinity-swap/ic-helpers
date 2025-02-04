@@ -15,8 +15,11 @@ use ic_exports::ic_cdk::api::management_canister::ecdsa::{
     EcdsaCurve, EcdsaKeyId, EcdsaPublicKeyArgument, EcdsaPublicKeyResponse, SignWithEcdsaArgument,
     SignWithEcdsaResponse,
 };
+use ic_exports::ic_cdk::api::management_canister::http_request::{
+    CanisterHttpRequestArgument, HttpResponse,
+};
 use ic_exports::ic_cdk::api::management_canister::provisional::CanisterId;
-use ic_exports::ic_kit::ic;
+use ic_exports::ic_kit::{ic, CallResult};
 use serde::{Deserialize, Serialize};
 
 use super::private::Sealed;
@@ -143,6 +146,8 @@ pub trait ManagementPrincipalExt: Sealed {
     async fn deposit_cycles(&self) -> Result<(), (RejectionCode, String)>;
     async fn raw_rand(&self) -> Result<Vec<u8>, (RejectionCode, String)>;
     async fn provisional_top_up(&self, amount: Nat) -> Result<(), (RejectionCode, String)>;
+
+    async fn http_request(&self, args: CanisterHttpRequestArgument) -> CallResult<HttpResponse>;
 }
 
 #[async_trait]
@@ -342,6 +347,16 @@ impl ManagementPrincipalExt for Principal {
                 amount,
             },),
             ()
+        )
+        .await
+    }
+
+    async fn http_request(&self, args: CanisterHttpRequestArgument) -> CallResult<HttpResponse> {
+        virtual_canister_call!(
+            Principal::management_canister(),
+            "http_request",
+            (args,),
+            HttpResponse
         )
         .await
     }

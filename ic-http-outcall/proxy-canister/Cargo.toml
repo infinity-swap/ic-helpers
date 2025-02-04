@@ -1,0 +1,17 @@
+[package]
+name = "ic-http-outcall-proxy-canister"
+version.workspace = true
+edition.workspace = true
+
+[features]
+default = []
+export-api = []
+
+[dependencies]
+ic-canister = { path = "../../ic-canister/ic-canister" }
+ic-exports = { path = "../../ic-exports" }
+ic-http-outcall-api = { path = "../api", features = ["proxy-api"] }
+
+
+candid = { workspace = true }
+serde = { workspace = true }
